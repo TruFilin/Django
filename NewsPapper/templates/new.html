@@ -1,0 +1,12 @@
+
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% block title %}
+Product
+{% endblock title %}
+
+{% block content %}
+<h1>{{ product.title }}</h1>
+<p>Дата написания: {{ product.time_written }}</p>
+<p>{{ product.content|censor }}</p>
+{% endblock content %}
