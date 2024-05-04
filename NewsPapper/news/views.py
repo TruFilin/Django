@@ -1,46 +1,69 @@
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from django.shortcuts import render
 from .models import Post
+from django.urls import reverse_lazy
 from datetime import datetime
+from .filters import PostFilter
+from .forms import PostForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Author
+
 
 class ProductsList(ListView):
-    # Указываем модель, объекты которой мы будем выводить
     model = Post
-    # Поле, которое будет использоваться для сортировки объектов
     ordering = 'categories'
-    # Указываем имя шаблона, в котором будут все инструкции о том,
-    # как именно пользователю должны быть показаны наши объекты
     template_name = 'news.html'
-    # Это имя списка, в котором будут лежать все объекты.
-    # Его надо указать, чтобы обратиться к списку объектов в html-шаблоне.
     context_object_name = 'products'
-
-    def news_view(request):
-        posts = Post.objects.all()  # Получаем все посты из базы данных
-        return render(request, 'news.html', {'posts': posts})
-
-    def news_view(request):
-        news_products = Product.objects.filter(category='news')  # Фильтрация объектов по категории "news"
+    paginate_by = 5
+    def filter_news(request):
+        your_model_filter = PostFilter(request.GET, queryset=Post.objects.all())
         context = {
-            'news_products': news_products
+            'filter': your_model_filter
         }
-        return render(request, 'your_template.html', context)
+        return render(request, 'news.html', context)
+
+
+
     def get_context_data(self, **kwargs):
-        # С помощью super() мы обращаемся к родительским классам
-        # и вызываем у них метод get_context_data с теми же аргументами,
-        # что и были переданы нам.
-        # В ответе мы должны получить словарь.
         context = super().get_context_data(**kwargs)
-        # К словарю добавим текущую дату в ключ 'time_now'.
         context['time_now'] = datetime.utcnow()
-        # Добавим ещё одну пустую переменную,
-        # чтобы на её примере рассмотреть работу ещё одного фильтра.
         context['next_sale'] = None
         return context
+
 class ProductDetail(DetailView):
-    # Модель всё та же, но мы хотим получать информацию по отдельному товару
     model = Post
-    # Используем другой шаблон — product.html
     template_name = 'new.html'
-    # Название объекта, в котором будет выбранный пользователем продукт
     context_object_name = 'product'
+
+class NewsCreate(CreateView):
+    form_class = PostForm
+    model = Post
+    template_name = 'news_edit.html'
+
+
+class NewsUpdate(UpdateView):
+    form_class = PostForm
+    model = Post
+    template_name = 'news_edit.html'
+
+# Представление удаляющее товар.
+class NewsDelete(DeleteView):
+    model = Post
+    template_name = 'news_delete.html'
+    success_url = reverse_lazy('product_list')
+class ArticleCreateView(CreateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'articles.html'
+    success_url = reverse_lazy('article_list')
+
+class ArticleUpdateView(UpdateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'article_form.html'
+    success_url = reverse_lazy('article_list')
+
+class ArticleDeleteView(DeleteView):
+    model = Post
+    template_name = 'articles_delete.html'
+    success_url = reverse_lazy('article_list')
