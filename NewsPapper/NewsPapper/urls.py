@@ -17,18 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.urls import path
-from news.views import NewsCreate, NewsUpdate, NewsDelete, ArticleCreateView, ArticleUpdateView, ArticleDeleteView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('pages/', include('django.contrib.flatpages.urls')),
-    path('news/', include('news.urls')),
-    path('news/create/', NewsCreate.as_view(), name='news_create'),
-    path('news/<int:pk>/edit/', NewsUpdate.as_view(), name='news_edit'),
-    path('news/<int:pk>/delete/', NewsDelete.as_view(), name='news_delete'),
-    path('articles/create/', ArticleCreateView.as_view(), name='article_create'),
-    path('articles/<int:pk>/edit/', ArticleUpdateView.as_view(), name='article_edit'),
-    path('articles/<int:pk>/delete/', ArticleDeleteView.as_view(), name='article_delete'),
+    path('', include('news.urls')),
+
 ]
 
 

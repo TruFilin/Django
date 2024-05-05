@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Author
 
 
-class ProductsList(ListView):
+class PostList(ListView):
     model = Post
     ordering = 'categories'
     template_name = 'news.html'
@@ -30,7 +30,7 @@ class ProductsList(ListView):
         context['next_sale'] = None
         return context
 
-class ProductDetail(DetailView):
+class PostDetail(DetailView):
     model = Post
     template_name = 'new.html'
     context_object_name = 'product'
@@ -50,20 +50,18 @@ class NewsUpdate(UpdateView):
 class NewsDelete(DeleteView):
     model = Post
     template_name = 'news_delete.html'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('post_list')
 class ArticleCreateView(CreateView):
+    form_class = PostForm
     model = Post
-    fields = ['title', 'content']
-    template_name = 'articles.html'
-    success_url = reverse_lazy('article_list')
+    template_name = 'articles_edit.html'
 
 class ArticleUpdateView(UpdateView):
+    form_class = PostForm
     model = Post
-    fields = ['title', 'content']
-    template_name = 'article_form.html'
-    success_url = reverse_lazy('article_list')
+    template_name = 'articles_edit.html'
 
 class ArticleDeleteView(DeleteView):
     model = Post
     template_name = 'articles_delete.html'
-    success_url = reverse_lazy('article_list')
+    success_url = reverse_lazy('post_list')
