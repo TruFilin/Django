@@ -17,7 +17,10 @@ Products
    {% for obj in filter.qs %}
        {# Вывод информации о каждом объекте, прошедшем фильтрацию #}
    {% endfor %}
-
+ {# Теперь будем проверять не request.user.is_authenticated, а конкретные права #}
+    {% if perms.simpleapp.add_product %}
+    <a href="{% url 'news_create' %}">Добавить статья</a>
+    {% endif %}
    <hr>
    {% if products %}
        <table>
@@ -26,6 +29,10 @@ Products
                <td>Название товара</td>
                <td>Дата добавления</td>
                <td>Краткое описание</td>
+               {# Условие получается составным. #}
+                {% if perms.news.change_product or perms.simpleapp.delete_product %}
+                <td>Действия</td>
+                {% endif %}
            </tr>
 
            {% for product in products %}
@@ -34,6 +41,15 @@ Products
                    <td>{{ product }}</td>
                    <td>{{ product.created_at|date:'M d Y H:i:s' }}</td>
                    <td>{{ product.content|slice:":20" }}</td>
+                    <td>
+                       {# А здесь доступ для каждой ссылки теперь будем проверять отдельно #}
+                    {% if perms.news.change_product %}
+                    <a href="{% url 'news_update' pk=post.id %}">Изменить</a>
+                    {% endif %}
+                    {% if perms.news.delete_product %}
+                    <a href="{% url 'news_delete' product.id %}">Удалить</a>
+                    {% endif %}
+                   </td>
                </tr>
            {% endfor %}
        </table>

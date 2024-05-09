@@ -36,32 +36,38 @@ class PostDetail(DetailView):
     context_object_name = 'product'
 
 class NewsCreate(CreateView):
+    permission_required = ('news.add_product',)
     form_class = PostForm
     model = Post
     template_name = 'news_edit.html'
 
 
 class NewsUpdate(UpdateView):
+    permission_required = ('news.update_product',)
     form_class = PostForm
     model = Post
     template_name = 'news_edit.html'
 
 # Представление удаляющее товар.
 class NewsDelete(DeleteView):
+    permission_required = ('news.delete_product',)
     model = Post
     template_name = 'news_delete.html'
     success_url = reverse_lazy('post_list')
 class ArticleCreateView(CreateView):
+    permission_required = ('news.add_product',)
     form_class = PostForm
     model = Post
     template_name = 'articles_edit.html'
 
 class ArticleUpdateView(UpdateView):
+    permission_required = ('news.update_product',)
     form_class = PostForm
     model = Post
     template_name = 'articles_edit.html'
 
 class ArticleDeleteView(DeleteView):
+    permission_required = ('news.delete_product',)
     model = Post
     template_name = 'articles_delete.html'
     success_url = reverse_lazy('post_list')
