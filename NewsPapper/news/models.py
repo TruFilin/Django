@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.urls import reverse
 
 
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -52,7 +54,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     rating = models.IntegerField(default=0)
-
+    subscribers = models.ManyToManyField(User, related_name='subscribed_posts')
 
     def like(self):
         self.rating += 1
@@ -102,3 +104,14 @@ class Comment(models.Model):
         self.post.author.update_rating()
         self.save()
 
+class Subscriber(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+    )
+    category = models.ForeignKey(
+        to='Category',
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+    )

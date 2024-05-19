@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from allauth.account.forms import SignupForm
+from django.core.mail import send_mail
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(label="Email")
     first_name = forms.CharField(label="Имя")
@@ -25,3 +26,15 @@ class CustomSignupForm(SignupForm):
             "password1",
             "password2",
         )
+
+class CustomSignupForm2(SignupForm):
+    def save(self, request):
+        user = super().save(request)
+
+        send_mail(
+            subject='Добро пожаловать в наш интернет-магазин!',
+            message=f'{user.username}, вы успешно зарегистрировались!',
+            from_email=None,  # будет использовано значение DEFAULT_FROM_EMAIL
+            recipient_list=[user.email],
+        )
+        return user

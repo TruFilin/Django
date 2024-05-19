@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.yandex',
+    "django_apscheduler",
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -135,6 +136,13 @@ USE_I18N = True
 LOGIN_REDIRECT_URL = "/news"
 USE_TZ = True
 SITE_ID = 1
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'konstantin.eihman@yandex.ru'
+EMAIL_HOST_PASSWORD = "Dolmatin322"
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
