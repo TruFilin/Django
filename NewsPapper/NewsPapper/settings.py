@@ -58,6 +58,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'NewsPapper.urls'
@@ -142,7 +145,89 @@ EMAIL_PORT = 465
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'konstantin.eihman@yandex.ru'
 EMAIL_HOST_PASSWORD = "Dolmatin322"
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'debug_only': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': lambda record: DEBUG,
+        },
+        'not_debug': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': lambda record: not DEBUG,
+        },
+    },
+    'formatters': {
+        'standard': {
+            'format': '[%(asctime)s] [%(levelname)s] %(message)s'
+        },
+        'detailed': {
+            'format': '[%(asctime)s] [%(levelname)s] [%(pathname)s] %(message)s'
+        },
+        'error_format': {
+            'format': '[%(asctime)s] [%(levelname)s] [%(pathname)s] %(message)s\n%(exc_info)s'
+        }
+    },
 
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'detailed',
+            'filters': [] if DEBUG else ['not_debug'],
+        },
+        'general_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'general.log',
+            'formatter': 'standard',
+            'filters': ['debug_only'] if DEBUG else [],
+        },
+        'errors_file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+            'formatter': 'error_format',
+            'filters': ['debug_only'] if DEBUG else [],
+        },
+        'security_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'standard',
+            'filters': ['debug_only'] if DEBUG else [],
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'error_format',
+            'filters': ['debug_only'] if DEBUG else [],
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'general_file', 'errors_file', 'mail_admins'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['errors_file', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['errors_file', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['security_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
@@ -151,7 +236,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-
+CACHES = {
+    'default': {
+        'TIMEOUT': 60, # добавляем стандартное время ожидания в минуту (по умолчанию это 5 минут — 300 секунд)
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'), # Указываем, куда будем сохранять кэшируемые файлы! Не забываем создать папку cache_files внутри папки с manage.py!
+    }
+}
 STATIC_URL = 'static/'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
